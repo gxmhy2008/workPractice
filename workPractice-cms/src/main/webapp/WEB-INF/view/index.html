@@ -1,0 +1,283 @@
+<head th:replace="~{common/html-header}" xmlns:th="http://www.thymeleaf.org"></head>
+<body>
+  <div
+    v-cloak
+    ref="auiWrapper"
+    class="aui-wrapper"
+    :class="[
+      'aui-header--' + headerSkin,
+      'aui-aside--' + asideSkin,
+      {
+        'aui-wrapper--center': wrapperCenter,
+        'aui-header--fixed': headerFixed,
+        'aui-aside--fixed': asideFixed,
+        'aui-aside--fold': asideFold,
+        'aui-aside--top': asideTop,
+        'aui-control--fixed': controlFixed,
+        'aui-control--open': controlOpen,
+        'aui-main-tabs__header--fixed': mainTabsHeaderFixed
+      }
+    ]"
+    v-loading.fullscreen.lock="loading"
+    element-loading-text="拼命加载中">
+    <template v-if="!loading">
+      <!-- aui-header -->
+      <div th:replace="~{common/layout-header}" ></div>
+      <!-- aui-aside -->
+      <div th:replace="~{common/layout-aside}"></div>
+      <!-- aui-control -->
+      <div th:replace="~{common/layout-control}"></div>
+      <!-- aui-main -->
+      <main class="aui-main">
+        <!-- standard 标准 -->
+        <div v-show="mainType === 'standard'" class="aui-main__hd">
+          <el-breadcrumb separator="/">
+            <el-breadcrumb-item>ssm-frame</el-breadcrumb-item>
+            <el-breadcrumb-item>首页</el-breadcrumb-item>
+          </el-breadcrumb>
+        </div>
+        <div v-show="mainType === 'standard'" class="aui-main__bd">
+          <div th:replace="~{fragment/pages/index}"></div>
+        </div>
+        <!-- tabs 标签页 -->
+        <el-dropdown v-show="mainType === 'tabs'" class="aui-main-tabs__tool">
+          <i class="el-icon-arrow-down"></i>
+          <el-dropdown-menu slot="dropdown">
+            <el-dropdown-item>关闭当前标签页</el-dropdown-item>
+            <el-dropdown-item>关闭其它标签页</el-dropdown-item>
+            <el-dropdown-item>关闭全部标签页</el-dropdown-item>
+          </el-dropdown-menu>
+        </el-dropdown>
+        <el-tabs v-show="mainType === 'tabs'" class="aui-main-tabs aui-tabs" v-model="mainTabsActive">
+          <el-tab-pane label="home" name="home" :closable="false" class="aui-main-tabs__pane--full">
+            <svg slot="label" class="aui-content--tabs-icon-nav icon-svg" aria-hidden="true"><use xlink:href="#icon-home"></use></svg>
+
+            <div th:replace="~{fragment/pages/index}"></div>
+
+          </el-tab-pane>
+          <el-tab-pane label="标签页2" name="2" closable>标签页2</el-tab-pane>
+          <el-tab-pane label="标签页3" name="3" closable>标签页3</el-tab-pane>
+          <el-tab-pane label="标签页5" name="5" closable>
+            <span slot="label"><i class="el-icon-date"></i> 标签页5</span>
+          </el-tab-pane>
+          <el-tab-pane label="标签页6" name="6" closable>标签页6</el-tab-pane>
+          <el-tab-pane label="标签页7" name="7" closable>标签页7</el-tab-pane>
+          <el-tab-pane label="标签页8" name="8" closable>标签页8</el-tab-pane>
+          <el-tab-pane label="标签页9" name="9" closable>标签页9</el-tab-pane>
+          <el-tab-pane label="标签页10" name="10" closable>标签页10</el-tab-pane>
+        </el-tabs>
+      </main>
+      <!-- aui-footer -->
+      <div th:replace="~{common/layout-footer}"></div>
+    </template>
+  </div>
+  <div th:replace="~{common/html-scripts}"></div>
+  <script th:inline="javascript">
+    (function () {
+      var vm = window.vm = new Vue({
+        el: '.aui-wrapper',
+        data: function () {
+          return {
+            // 滚动条, 滚动高度
+            scrollbarHeight: 0,
+            // DOM Element对象
+            DOM: {},
+            // 加载中
+            loading: true,
+            // 容器, 居中
+            wrapperCenter: false,
+            // 头部, 皮肤 (white 白色 / colorful 鲜艳)
+            headerSkin: 'colorful',
+            // 头部, 固定状态
+            headerFixed: false,
+            // 侧边, 皮肤 (white 白色 / dark 黑色)
+            asideSkin: 'dark',
+            // 侧边, 固定状态
+            asideFixed: false,
+            // 侧边, 折叠状态
+            asideFold: false,
+            // 侧边, 至头部状态
+            asideTop: false,
+            // 侧边, 菜单显示状态 (控制台“至头部”操作时, el-menu组件需根据mode属性重新渲染)
+            asideMenuVisible: true,
+            // 侧边, 菜单选中
+            asideMenuActive: 'home',
+            // 搜索, 显示状态
+            searchVisible: false,
+            // 搜索, 值
+            search: '',
+            // 控制台, 固定状态
+            controlFixed: false,
+            // 控制台, 打开状态
+            controlOpen: true,
+            // 控制台, 标签页选中
+            controlTabsActive: 'layout',
+            // 主内容, 展示类型 (standard 标准 / tabs 标签页)
+            mainType: 'standard', 
+            // 主标签页, 列表
+            mainTabs: [],
+            // 主标签页, 选中
+            mainTabsActive: 'home',
+            // 主标签页, 头部固定状态
+            mainTabsHeaderFixed: false,
+            // 皮肤, 默认值
+            skin: 'orange',
+            // 皮肤, 列表
+            skinList: [
+              { name: 'blue'     , color: '#3E8EF7', remark: '蓝色' },
+              { name: 'brown'    , color: '#997B71', remark: '棕色' },
+              { name: 'cyan'     , color: '#0BB2D4', remark: '青色' },
+              { name: 'gray'     , color: '#757575', remark: '灰色' },
+              { name: 'green'    , color: '#11C26D', remark: '绿色' },
+              { name: 'indigo'   , color: '#667AFA', remark: '靛青色' },
+              { name: 'orange'   , color: '#EB6709', remark: '橙色' },
+              { name: 'pink'     , color: '#F74584', remark: '粉红色' },
+              { name: 'purple'   , color: '#9463F7', remark: '紫色' },
+              { name: 'red'      , color: '#FF4C52', remark: '红色' },
+              { name: 'turquoise', color: '#17B3A3', remark: '蓝绿色' },
+              { name: 'yellow'   , color: '#FCB900', remark: '黄色' }
+            ],
+            indexNoticeTabsActive: '1',
+            indexPersonalTabsActive: '1'
+          }
+        },
+        watch: {
+          scrollbarHeight: function (val) {
+            vm.yLayoutFixedHandle();
+          },
+          wrapperCenter: function (val) {
+            vm.headerFixed = false;
+            vm.asideFixed = false;
+            vm.controlFixed = false;
+            vm.mainTabsHeaderFixed = false;
+          },
+          headerFixed: function (val) {
+            vm.yLayoutFixedHandle();
+          },
+          asideFixed: function (val) {
+            vm.yLayoutFixedHandle();
+          },
+          asideTop: function (val) {
+            vm.yLayoutFixedHandle();
+            vm.asideMenuVisible = false;
+            vm.$nextTick(function () {
+              vm.asideMenuVisible = true;
+            });
+          },
+          controlFixed: function (val) {
+            vm.yLayoutFixedHandle();
+          },
+          mainTabsHeaderFixed: function (val) {
+            vm.yLayoutFixedHandle();
+          }
+        },
+        beforeCreate () {
+          vm = this;
+        },
+        created () {
+          vm.loading = false;
+          vm.$nextTick(function () {
+            vm.scrollbarHandle(true);
+            vm.getDOM();
+            vm.searchHandle();
+          });
+        },
+        methods: {
+          // 滚动条, 滚动距离
+          scrollbarHandle: function (isInit) {
+            if (isInit && typeof(isInit) === 'boolean') {
+              window.addEventListener('scroll', vm.scrollbarHandle);
+            }
+            vm.scrollbarHeight = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop;
+          },
+          // 获取DOM Element对象
+          getDOM: function () {
+            vm.DOM.header  = vm.$refs.auiWrapper.querySelector('.aui-header');
+            vm.DOM.aside   = vm.$refs.auiWrapper.querySelector('.aui-aside');
+            vm.DOM.control = vm.$refs.auiWrapper.querySelector('.aui-control');
+            vm.DOM.main    = vm.$refs.auiWrapper.querySelector('.aui-main');
+            vm.DOM.mainTabsTool   = vm.DOM.main.querySelector('.aui-main-tabs__tool');
+            vm.DOM.mainTabsHeader = vm.DOM.main.querySelector('.aui-main-tabs > .el-tabs__header');
+          },
+          // Y轴布局固定
+          yLayoutFixedHandle: function () {
+            var _offsetHeight = vm.scrollbarHeight >= vm.DOM.header.offsetHeight ? 0 : vm.DOM.header.offsetHeight - vm.scrollbarHeight;
+            // 侧边
+            if (!vm.headerFixed && vm.asideTop && vm.asideFixed) {
+              vm.DOM.aside.style.top = _offsetHeight + 'px';
+            } else {
+              vm.DOM.aside.style.removeProperty('top');
+            }
+            // 控制台
+            if (!vm.headerFixed && vm.controlFixed) {
+              vm.DOM.control.style.top = _offsetHeight + 'px';
+            } else {
+              vm.DOM.control.style.removeProperty('top');
+            }
+            // 主标签页, 头部
+            if (!vm.headerFixed && vm.mainTabsHeaderFixed) {
+              if (vm.asideTop && vm.asideFixed) {
+                _offsetHeight += vm.DOM.aside.offsetHeight;
+              }
+              if (vm.asideTop && !vm.asideFixed) {
+                _offsetHeight = vm.scrollbarHeight >= vm.DOM.header.offsetHeight + vm.DOM.aside.offsetHeight ? 0 : vm.DOM.header.offsetHeight + vm.DOM.aside.offsetHeight - vm.scrollbarHeight;
+              }
+              vm.DOM.mainTabsTool.style.top = _offsetHeight + 'px';
+              vm.DOM.mainTabsHeader.style.top = _offsetHeight + 'px';
+            } else {
+              vm.DOM.mainTabsTool.style.removeProperty('top');
+              vm.DOM.mainTabsHeader.style.removeProperty('top');
+            }
+          },
+          // 搜索, 显示／隐藏
+          searchHandle: function () {
+            vm.$refs.auiWrapper.querySelector('.aui-search__toggle').addEventListener('click', function (e) {
+              e.cancelBubble = true;
+            });
+            vm.$refs.auiWrapper.querySelector('.aui-search').addEventListener('click', function (e) {
+              e.cancelBubble = true;
+            });
+            window.addEventListener('click', function (e) {
+              if (vm.searchVisible) {
+                vm.searchVisible = false;
+              }
+            });
+          },
+          // 跳转页面
+          gotoPageHandle: function (url) {
+            if (!/\S/.test(url) || location.href.indexOf(url.replace(/^(\.*\/)*/, '')) !== -1) {
+              return false;
+            }
+            window.location.href = [[${#httpServletRequest.getContextPath()}]] + url;
+          },
+          // 皮肤切换
+          skinChangeHandle: function (val) {
+            var styleList = [
+              {
+                id: 'J_elementTheme',
+                url: '/static/element-theme/' + val + '/index.css?t=' + new Date().getTime()
+              },
+              {
+                id: 'J_auiSKin',
+                url: '/static/css/aui/aui-' + val + '.min.css?t=' + new Date().getTime()
+              }
+            ];
+            for (var i = 0; i < styleList.length; i++) {
+              var el = document.querySelector('#' + styleList[i].id);
+              if (el) {
+                el.href = styleList[i].url;
+                continue;
+              }
+              el = document.createElement('link');
+              el.id = styleList[i].id;
+              el.href = styleList[i].url;
+              el.rel = 'stylesheet';
+              document.querySelector('head').appendChild(el);
+            }
+          }
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

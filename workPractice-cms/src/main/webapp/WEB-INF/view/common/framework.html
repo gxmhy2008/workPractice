@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="commonHeader(title)">
+    <th:block th:include="~{common/html-header :: htmlHead(${title})}" th:remove="tag"></th:block>
+</head>
+<body>
+    <div v-cloak th:fragment="commonBody(pageName,breadcrumb1,breadcrumb2)" ref="auiWrapper" class="aui-wrapper"
+         :class="['aui-header--' + headerSkin,'aui-aside--' + asideSkin,
+              {
+                'aui-wrapper--center': wrapperCenter,
+                'aui-header--fixed': headerFixed,
+                'aui-aside--fixed': asideFixed,
+                'aui-aside--fold': asideFold,
+                'aui-aside--top': asideTop,
+                'aui-control--fixed': controlFixed,
+                'aui-control--open': controlOpen,
+                'aui-main-tabs__header--fixed': mainTabsHeaderFixed
+              }
+            ]"
+         v-loading.fullscreen.lock="loading" element-loading-text="拼命加载中">
+        <template v-if="!loading">
+            <!-- aui-header -->
+            <div th:replace="~{common/layout-header}" ></div>
+            <!-- aui-aside -->
+            <div th:replace="~{common/layout-aside}"></div>
+            <!-- aui-control -->
+            <div th:replace="~{common/layout-control}"></div>
+            <!-- aui-main -->
+            <main class="aui-main">
+                <!-- standard 标准 -->
+                <div v-show="mainType === 'standard'" class="aui-main__hd">
+                    <el-breadcrumb separator="/">
+                        <el-breadcrumb-item th:text="${breadcrumb1}">ssm-frame</el-breadcrumb-item>
+                        <el-breadcrumb-item th:text="${breadcrumb2}">首页</el-breadcrumb-item>
+                    </el-breadcrumb>
+                </div>
+                <div v-show="mainType === 'standard'" class="aui-main__bd">
+                    <!--<div th:replace="~{fragment/pages/index}"></div>-->
+                    <div th:replace="~{${pageName} :: content}"></div>
+                </div>
+                <!-- tabs 标签页 -->
+                <el-dropdown v-show="mainType === 'tabs'" class="aui-main-tabs__tool">
+                    <i class="el-icon-arrow-down"></i>
+                    <el-dropdown-menu slot="dropdown">
+                        <el-dropdown-item>关闭当前标签页</el-dropdown-item>
+                        <el-dropdown-item>关闭其它标签页</el-dropdown-item>
+                        <el-dropdown-item>关闭全部标签页</el-dropdown-item>
+                    </el-dropdown-menu>
+                </el-dropdown>
+                <el-tabs v-show="mainType === 'tabs'" class="aui-main-tabs aui-tabs" v-model="mainTabsActive">
+                    <el-tab-pane label="home" name="home" :closable="false" class="aui-main-tabs__pane--full">
+                        <svg slot="label" class="aui-content--tabs-icon-nav icon-svg" aria-hidden="true"><use xlink:href="#icon-home"></use></svg>
+
+                        <!--<div th:replace="~{fragment/pages/index}"></div>-->
+                        <div th:replace="~{${pageName} :: content}"></div>
+                    </el-tab-pane>
+                    <el-tab-pane label="标签页2" name="2" closable>标签页2</el-tab-pane>
+                    <el-tab-pane label="标签页3" name="3" closable>标签页3</el-tab-pane>
+                    <el-tab-pane label="标签页5" name="5" closable>
+                        <span slot="label"><i class="el-icon-date"></i> 标签页5</span>
+                    </el-tab-pane>
+                    <el-tab-pane label="标签页6" name="6" closable>标签页6</el-tab-pane>
+                    <el-tab-pane label="标签页7" name="7" closable>标签页7</el-tab-pane>
+                    <el-tab-pane label="标签页8" name="8" closable>标签页8</el-tab-pane>
+                    <el-tab-pane label="标签页9" name="9" closable>标签页9</el-tab-pane>
+                    <el-tab-pane label="标签页10" name="10" closable>标签页10</el-tab-pane>
+                </el-tabs>
+            </main>
+            <!-- aui-footer -->
+            <div th:replace="~{common/layout-footer}"></div>
+        </template>
+    </div>
+    <!--<div th:replace="~{common/html-scripts}"></div>-->
+</body>
+</html>
+
+

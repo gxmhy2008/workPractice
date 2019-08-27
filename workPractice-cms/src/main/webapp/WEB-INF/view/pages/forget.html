@@ -1,0 +1,77 @@
+<div th:replace="~{common/html-header}"></div>
+<body>
+  <div v-cloak class="aui-page page-login">
+    <div class="login-wrapper">
+      <!-- page-header -->
+      <div th:replace="~{common/page-header}"></div>
+      <!-- page-main -->
+      <main class="aui-page-main">
+        <div th:replace="~{fragment/pages/forget}"></div>
+      </main>
+      <!-- page-footer -->
+      <div th:replace="~{common/page-footer}"></div>
+    </div>
+  </div>
+  <div th:replace="~{common/html-scripts}"></div>
+  <script>
+    (function () {
+      var vm = window.vm = new Vue({
+        el: '.aui-page',
+        data: function () {
+          return {
+            step: 1,
+            dataForm: {
+              mobile: '',
+              captcha: '',
+              smsCaptcha: ''
+            },
+            dataRule: {
+              mobile: [
+                { required: true, message: '必填项不能为空', trigger: 'blur' }
+              ],
+              captcha: [
+                { required: true, message: '必填项不能为空', trigger: 'blur' }
+              ],
+              smsCaptcha: [
+                { required: true, message: '必填项不能为空', trigger: 'blur' }
+              ]
+            },
+            dataForm2: {
+              password: '',
+              confirmPassword: ''
+            },
+            dataRule2: {
+              password: [
+                { required: true, message: '必填项不能为空', trigger: 'blur' }
+              ],
+              confirmPassword: [
+                { required: true, message: '必填项不能为空', trigger: 'blur' }
+              ]
+            }
+          }
+        },
+        beforeCreate () {
+          vm = this;
+        },
+        methods: {
+          dataFormSubmitHandle () {
+            vm.$refs['dataForm'].validate(function (valid) {
+              if (valid) {
+                vm.$refs['dataForm'].clearValidate();
+                vm.step++;
+              }
+            });
+          },
+          dataForm2SubmitHandle () {
+            vm.$refs['dataForm2'].validate(function (valid) {
+              if (valid) {
+                window.location.href = './login.html';
+              }
+            });
+          }
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

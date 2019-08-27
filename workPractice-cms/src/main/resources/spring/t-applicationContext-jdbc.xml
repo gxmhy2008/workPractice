@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx" xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+	   http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.2.xsd
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd
+       http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.2.xsd">
+
+    <!-- 数据源配置,使用应用内的DBCP数据库连接池 -->
+    <bean id="baseDataSource" >
+        <!-- 配置初始化大小、最小、最大 -->
+        <property name="initialSize" value="${druid.initialSize}" />
+        <property name="minIdle" value="${druid.minIdle}" />
+        <property name="maxActive" value="${druid.maxActive}" />
+
+        <!-- 配置获取连接等待超时的时间 -->
+        <property name="maxWait" value="${druid.maxWait}" />
+        <!-- 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 -->
+        <property name="timeBetweenEvictionRunsMillis" value="${druid.timeBetweenEvictionRunsMillis}" />
+
+        <!-- 配置一个连接在池中最小生存的时间，单位是毫秒 -->
+        <property name="minEvictableIdleTimeMillis" value="${druid.minEvictableIdleTimeMillis}" />
+
+        <property name="testWhileIdle" value="${druid.testWhileIdle}" />
+        <property name="testOnBorrow" value="${druid.testOnBorrow}" />
+        <property name="testOnReturn" value="${druid.testOnReturn}" />
+
+        <!-- 打开PSCache，并且指定每个连接上PSCache的大小 如果用Oracle，则把poolPreparedStatements配置为true，mysql可以配置为false。 -->
+        <property name="poolPreparedStatements" value="${druid.poolPreparedStatements}" />
+        <property name="maxPoolPreparedStatementPerConnectionSize"
+                  value="${druid.maxPoolPreparedStatementPerConnectionSize}" />
+
+        <!-- 配置监控统计拦截的filters -->
+        <property name="filters" value="${druid.filters}" />
+    </bean>
+
+    <bean id="testDB1" parent="baseDataSource" class="com.alibaba.druid.pool.DruidDataSource" destroy-method="close">
+        <property name="driverClassName" value="${base.jdbc.driverClassName}" />
+        <property name="url" value="${base.jdbc.url}" />
+        <property name="username" value="${base.jdbc.username}" />
+        <property name="password" value="${base.jdbc.password}" />
+    </bean>
+    <bean id="testDB2" parent="baseDataSource" class="com.alibaba.druid.pool.DruidDataSource" destroy-method="close">
+        <property name="driverClassName" value="${base.jdbc.driverClassName}" />
+        <property name="url" value="${base.jdbc.url}" />
+        <property name="username" value="${base.jdbc.username}" />
+        <property name="password" value="${base.jdbc.password}" />
+    </bean>
+
+
+    <bean id="dataSource" class="com.gxm.workPractice.cms.util.db.DynamicDataSource">
+        <property name="targetDataSources">
+            <map key-type="java.lang.String">
+                <entry key="testDB1" value-ref="testDB1" />
+                <entry key="testDB2" value-ref="testDB2" />
+            </map>
+        </property>
+        <property name="defaultTargetDataSource" ref="testDB1" />
+    </bean>
+
+    <!-- MyBatis SqlSessionFactoryBean 配置 -->
+    <!--两个数据库对应几个sqlSessionFactory实例-->
+    <bean id="sqlSessionFactory" class="com.baomidou.mybatisplus.spring.MybatisSqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource" />
+        <property name="configLocation" value="classpath:xml/mybatis-config.xml" />
+        <property name="typeAliasesPackage" value="com.gxm.workPractice.service.entity;com.gxm.workPractice.service.entity.vo" />
+        <property name="mapperLocations" value="classpath:com/gxm/workPractice/service/mapper/xml/*Mapper.xml" />
+        <property name="plugins">
+            <array>
+                <!-- 分页插件配置 -->
+                <bean id="paginationInterceptor" class="com.baomidou.mybatisplus.plugins.PaginationInterceptor">
+                    <property name="dialectType" value="mysql" />
+                </bean>
+            </array>
+        </property>
+    </bean>
+
+    <!-- spring与mybatis整合配置,加载 *Mapper.xml 的接口,扫描所有的dao对象 -->
+    <bean id="mapperScannerConfigurer" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.gxm.workPractice.service.mapper" />
+    </bean>
+
+    <!--切面通知实现类-->
+    <bean id="dbAspect" class="com.gxm.workPractice.cms.util.db.DBAspect" />
+
+    <!--配置切面，用于指定数据库来执行sql-->
+    <aop:config>
+        <aop:aspect ref="dbAspect">
+            <aop:pointcut id="tx" expression="execution(* com.gxm.workPractice.service.mapper.*.*(..))" />
+            <aop:before method="before" pointcut-ref="tx" />
+            <aop:after method="after" pointcut-ref="tx" />
+        </aop:aspect>
+    </aop:config>
+
+</beans>

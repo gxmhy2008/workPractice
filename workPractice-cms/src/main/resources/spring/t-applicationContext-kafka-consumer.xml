@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd">
+
+    <!--开启包扫描,因为ConsumerService类需要用到controller里相关的bean,
+    如果不开启扫描,用到的bean注入时间晚于ConsumerService,导致ConsumerService注入失败-->
+    <context:component-scan base-package="com.gxm.workPractice.cms.controller"/>
+    <!--1.定义consumer的参数-->
+    <bean id="consumerProperties" class="java.util.HashMap">
+        <constructor-arg>
+            <map>
+                <entry key="bootstrap.servers" value="${kafka.consumer.bootstrap.servers}"/>
+                <entry key="group.id" value="${kafka.consumer.group.id}" />
+                <entry key="enable.auto.commit" value="${kafka.consumer.auto.commit}"/>
+                <entry key="auto.commit.interval.ms" value="${kafka.consumer.auto.commit.interval}"/>
+                <entry key="session.timeout.ms" value="${kafka.consumer.session.timeout}"/>
+                <entry key="key.deserializer" value="${kafka.consumer.key.deserializer}"/>
+                <entry key="value.deserializer" value="${kafka.consumer.value.deserializer}"/>
+            </map>
+        </constructor-arg>
+    </bean>
+
+    <!--2.创建consumerFactory消费者工厂 bean-->
+    <bean id="consumerFactory" class="org.springframework.kafka.core.DefaultKafkaConsumerFactory">
+        <constructor-arg>
+            <ref bean="consumerProperties"/>
+        </constructor-arg>
+    </bean>
+
+    <!--3.定义消费者实现类-->
+    <bean id="ConsumerService" class="com.gxm.workPractice.cms.kafka.consumer.ConsumerService" />
+
+    <!--4.消费者容器配置信息-->
+    <bean id="containerProperties" class="org.springframework.kafka.listener.config.ContainerProperties">
+        <!--订阅的topics-->
+        <constructor-arg name="topics">
+            <list>
+                <value>${kafka.consumer.subscribe.topic}</value>
+            </list>
+        </constructor-arg>
+        <property name="messageListener" ref="ConsumerService" />
+    </bean>
+
+    <!--5.消费者并发消息监听容器,执行doStart()方法-->
+    <bean id="messageListenerContainer" class="org.springframework.kafka.listener.ConcurrentMessageListenerContainer" init-method="doStart">
+        <constructor-arg ref="consumerFactory"/>
+        <constructor-arg ref="containerProperties" />
+        <property name="concurrency" value="1" />
+    </bean>
+</beans>
