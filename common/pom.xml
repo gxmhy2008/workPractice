@@ -11,6 +11,7 @@
   <properties>
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
       <joda.time.version>2.9.9</joda.time.version>
+      <org.aspect.version>1.8.6</org.aspect.version>
   </properties>
   <dependencies>
 	<dependency>
@@ -41,6 +42,16 @@
           <groupId>javax.validation</groupId>
           <artifactId>validation-api</artifactId>
           <version>1.1.0.Final</version>
+      </dependency>
+      <dependency>
+          <groupId>org.aspectj</groupId>
+          <artifactId>aspectjrt</artifactId>
+          <version>${org.aspect.version}</version>
+      </dependency>
+      <dependency>
+          <groupId>org.aspectj</groupId>
+          <artifactId>aspectjweaver</artifactId>
+          <version>${org.aspect.version}</version>
       </dependency>
   </dependencies>
 </project>
