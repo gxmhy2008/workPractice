@@ -27,6 +27,7 @@
         <spring-data-redis-version>1.8.9.RELEASE</spring-data-redis-version>
         <redis-clients-version>2.9.0</redis-clients-version>
         <mybatis-plus.version>2.3</mybatis-plus.version>
+        <mysql-connector.version>5.1.38</mysql-connector.version>
     </properties>
     <dependencies>
         <!--spring框架配置开始-->
@@ -178,6 +179,11 @@
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus</artifactId>
             <version>${mybatis-plus.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>${mysql-connector.version}</version>
         </dependency>
         <!-- mybatis-plus end -->
         <!--swagger begin-->

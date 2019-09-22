@@ -9,8 +9,16 @@
        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd
        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.2.xsd">
 
+
+    <!-- 扫描 service -->
+    <context:component-scan base-package="com.gxm.workPractice.service.service" />
+    <context:component-scan base-package="com.gxm.workPractice.service.common" />
+
+    <!-- 使用annotation注解方式配置事务 -->
+    <tx:annotation-driven transaction-manager="transactionManager" />
     <!-- 数据源配置,使用应用内的DBCP数据库连接池 -->
-    <bean id="baseDataSource" >
+    <bean id="baseDataSource" class="com.alibaba.druid.pool.DruidDataSource" destroy-method="close">
+        <property name="driverClassName" value="${base.jdbc.driverClassName}" />
         <!-- 配置初始化大小、最小、最大 -->
         <property name="initialSize" value="${druid.initialSize}" />
         <property name="minIdle" value="${druid.minIdle}" />
@@ -37,19 +45,20 @@
         <property name="filters" value="${druid.filters}" />
     </bean>
 
-    <bean id="testDB1" parent="baseDataSource" class="com.alibaba.druid.pool.DruidDataSource" destroy-method="close">
-        <property name="driverClassName" value="${base.jdbc.driverClassName}" />
-        <property name="url" value="${base.jdbc.url}" />
-        <property name="username" value="${base.jdbc.username}" />
-        <property name="password" value="${base.jdbc.password}" />
+    <bean id="testDB1" parent="baseDataSource">
+        <property name="url" value="${dps1.jdbc.url}" />
+        <property name="username" value="${dps1.jdbc.username}" />
+        <property name="password" value="${dps1.jdbc.password}" />
     </bean>
-    <bean id="testDB2" parent="baseDataSource" class="com.alibaba.druid.pool.DruidDataSource" destroy-method="close">
-        <property name="driverClassName" value="${base.jdbc.driverClassName}" />
-        <property name="url" value="${base.jdbc.url}" />
-        <property name="username" value="${base.jdbc.username}" />
-        <property name="password" value="${base.jdbc.password}" />
+    <bean id="testDB2" parent="baseDataSource">
+        <property name="url" value="${dps2.jdbc.url}" />
+        <property name="username" value="${dps2.jdbc.username}" />
+        <property name="password" value="${dps2.jdbc.password}" />
     </bean>
-
+    <!-- 使用JDBC事物 -->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource" />
+    </bean>
 
     <bean id="dataSource" class="com.gxm.workPractice.cms.util.db.DynamicDataSource">
         <property name="targetDataSources">
