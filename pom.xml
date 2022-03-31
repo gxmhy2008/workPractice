@@ -7,7 +7,7 @@
     <packaging>pom</packaging>
     <properties>
         <java.version>1.7</java.version>
-        <springframework-version>4.3.18.RELEASE</springframework-version>
+        <springframework-version>5.3.18</springframework-version>
         <resource.delimiter>@</resource.delimiter> <!-- delimiter that doesn't clash with Spring ${} placeholders -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
