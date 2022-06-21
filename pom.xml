@@ -27,7 +27,7 @@
         <spring-data-redis-version>1.8.9.RELEASE</spring-data-redis-version>
         <redis-clients-version>2.9.0</redis-clients-version>
         <mybatis-plus.version>2.3</mybatis-plus.version>
-        <mysql-connector.version>5.1.38</mysql-connector.version>
+        <mysql-connector.version>8.0.28</mysql-connector.version>
     </properties>
     <dependencies>
         <!--spring框架配置开始-->
